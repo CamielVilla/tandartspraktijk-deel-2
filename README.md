@@ -30,7 +30,7 @@ met het maken van wijzigingen in `src/page.tsx`.
 
 ## Opdrachtbeschrijving
 
-Begin met het lezen van de officiële Next.js-documentatie. Je hoeft nog niet alles te begrijpen. Probeer vooral een globaal beeld te krijgen van:
+Begin met het lezen van de officiële [Next.js-documentatie](https://nextjs.org/docs). Je hoeft nog niet alles te begrijpen. Probeer vooral een globaal beeld te krijgen van:
 
 * hoe een Next.js-project is opgebouwd;
 * wat de `app`-map doet;
@@ -41,9 +41,7 @@ Begin met het lezen van de officiële Next.js-documentatie. Je hoeft nog niet al
 > "Wat is volgens jou het belangrijkste verschil tussen een traditioneel React-project en een Next.js-project?"
 
 ### 1. Pas de metadata aan
-Pas de titel van de website aan, zodat in het browsertabblad de naam van de tandartspraktijk wordt weergegeven.
-
-In de public-map zit een SVG-bestand met het logo van de tandartspraktijk. Zorg ervoor dat dit logo in het browsertabblad wordt gebruikt in plaats van het standaard Next.js-logo.
+Zorg ervoor dat de naam van de tandartspraktijk in het browsertabblad wordt weergegeven. En nu we daar toch zijn: in de `public`-map zit een SVG-bestand met het logo van de tandartspraktijk. Vervang het standaard Next.js-logo met het bedrijfslogo.
 
 ### 2. Navigatie
 
@@ -74,9 +72,9 @@ Daarbinnen kun je de volgende CSS-classes op de elementen gebruiken:
 
 ### 3. Routing
 
-Maak voor iedere route een pagina en zet de routingstructuur op. De inhoud van deze pagina's mag in eerste instantie heel eenvoudig zijn. Geef iedere pagina bijvoorbeeld een eigen `<h1>` met de naam van de pagina. Controleer vervolgens of je via de navigatie daadwerkelijk naar iedere pagina kunt gaan.
+Maak voor iedere route een pagina en zet de routingstructuur op. De inhoud van deze pagina's mag in eerste instantie heel eenvoudig zijn. Geef iedere pagina bijvoorbeeld een eigen `<h1>` met de naam van de pagina. Controleer vervolgens of je via de navigatie daadwerkelijk op iedere pagina kunt komen.
 
-Maar: niet iedere URL die een gebruiker intypt zal bestaan. Maak daarom een eigen 404-pagina die wordt weergegeven wanneer een gebruiker naar een route gaat die niet bestaat. Test dit door een URL te bezoeken die je zelf niet hebt aangemaakt.
+Echter, niet iedere URL die een gebruiker intypt zal bestaan. Maak daarom ook een 404-pagina die wordt weergegeven wanneer een gebruiker naar een route gaat die niet bestaat. Test dit door een random URL te bezoeken, zoals `/fietsen`.
 
 ### 5. Content
 
@@ -231,7 +229,9 @@ Een gebruiker moet vanuit de afsprakenpagina kunnen doorklikken naar de plek waa
 
 `/afspraken/maken`
 
-Dit is een **nested route**. Nested routes zie je vooral wanneer een pagina onderdeel is van een grotere structuur, zoals webshops met productcategorieën. Pas je mappenstructuur zo aan dat deze URL automatisch door Next.js wordt herkend. Geef de nieuwe pagina eerst een eenvoudige titel om te controleren of de routing werkt. Daarna kun je deze vullen met de volgende HTML:
+Dit is een **nested route**. Nested routes zie je vooral wanneer een pagina onderdeel is van een grotere structuur, zoals webshops met productcategorieën. Pas je mappenstructuur zo aan dat deze URL automatisch door Next.js wordt herkend. Geef de nieuwe pagina eerst een eenvoudige titel om te controleren of de routing werkt. 
+
+Daarna kun je deze vullen met de volgende HTML:
 
 ```html
 <main className="page-container">
@@ -293,9 +293,7 @@ Dit is een **nested route**. Nested routes zie je vooral wanneer een pagina onde
 ```
 
 ### 6. Dynamic route
-De tandartspraktijk biedt verschillende behandelingen aan waarvoor een afspraak gemaakt kan worden.
-
-Op dit moment zijn er bijvoorbeeld:
+De tandartspraktijk biedt verschillende behandelingen aan waarvoor een afspraak gemaakt kan worden. Op dit moment zijn er bijvoorbeeld:
 * een periodieke controle;
 * tanden bleken;
 * een klacht, zoals pijn of een uitgevallen kies.
@@ -309,7 +307,7 @@ De URL's moeten bijvoorbeeld worden:
 * `/afspraken/maken/bleken`
 * `/afspraken/maken/klacht`
 
-Maak hiervoor een dynamic route met bijbehorende pagina. Wanneer een gebruiker bijvoorbeeld naar: `/afspraken/maken/bleken` gaat, moet op de pagina de naam van de behandeling worden weergegeven ("Tanden bleken"). Gebruik deze array om op de pagina te bepalen welke behandelingen bij welke url hoort:
+Maak hiervoor een dynamic route met bijbehorende pagina. Wanneer een gebruiker bijvoorbeeld naar: `/afspraken/maken/bleken` gaat, moet op de pagina de naam van de behandeling worden weergegeven (_"Tanden bleken"_). Gebruik onderstaande array om op de pagina te bepalen welke behandelingen bij welke url hoort:
 
 ```js
 const treatments = [
@@ -319,7 +317,7 @@ const treatments = [
 ];
 ```
 
-Wat gebeurt er als iemand `/afspraken/maken/fietsen` intypt? Dat is natuurlijk niet de bedoeling! Zorg ervoor dat een gebruiker in dat geval wordt doorgestuurd naar de 404-pagina.
+Wat gebeurt er nu als iemand `/afspraken/maken/fietsen` intypt? Dat is natuurlijk niet de bedoeling! Zorg ervoor dat een gebruiker in dat geval wordt doorgestuurd naar de 404-pagina.
 
 > Wat is het verschil tussen een URL waarvoor helemaal geen route bestaat en een URL die wel bij een dynamic route past, maar waarvan de slug geen geldige behandeling is?
 
@@ -364,7 +362,7 @@ De pagina voor een specifieke behandeling bevat een eenvoudige kalender en een l
 </main>
 ```
 
-Het hardcoded declareren van de tijden in de HTML is natuurlijk een beetje suf. Gebruik deze array om dit efficiënter weer te geven:
+Het hardcoded declareren van de tijden in de HTML is natuurlijk een beetje suf. Gebruik deze array om dit efficiënter weer te geven in de HTML:
 
 ```js
 const times = [ "09:00", "09:30", "10:00", "10:30", "11:00", "11:30"];
@@ -372,7 +370,7 @@ const times = [ "09:00", "09:30", "10:00", "10:30", "11:00", "11:30"];
 
 > Waarom is het in dit geval handiger om de times-array _buiten_ de functie te declareren in plaats van binnen de functie?
 
-Breng nu de kalender met tijd-selectie onder in een **apart component**, die je gebruikt op deze pagina. Geef de `times`-array vanaf de pagina door als prop.
+Zet de HTML voor de kalender en de tijd-selectie nu in een **apart component**. Geef de `times`-array vanaf deze pagina door als property aan dit component.
 
 > Om de kalender interactief te maken hebben we state nodig. Wat moet je in Next.js doen om gebruik te kunnen maken van state?
 
