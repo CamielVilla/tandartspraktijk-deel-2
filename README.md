@@ -1,381 +1,233 @@
-# Opdrachtbeschrijving
+# Opdrachtbeschrijving - deel 2
 
 ## Inleiding
-In deze opdracht ga je een bestaande Next.js-applicatie met Typescript verder uitbouwen voor Tandartspraktijk de
-Tandenborstel. Die herken je misschien nog wel! Je gaat onder andere werken met routing, nested routes, dynamic routes en Client Components.
+In deel 1 heb je de basisstructuur van de website van Tandartspraktijk de Tandenborstel opgezet: routing, nested routes, een dynamic route per behandeling en een interactieve (maar nog volledig statische) kalenderwidget waarmee een bezoeker een datum en tijd kon *selecteren* — zonder dat daar verder iets mee gebeurde.
 
-De basis van het project is al voor je klaargezet. De styling en het logo zijn al aanwezig. Het is aan jou om de structuur en functionaliteit van de applicatie met Next.js op te bouwen.
+In deel 2 bouw je deze opdracht verder uit tot een applicatie die daadwerkelijk werkt: de lijst met behandelingen en beschikbare tijden komt niet langer uit een hardcoded array, maar van de server. Een bezoeker kan een afspraak echt vastleggen, en die afspraak wordt serverside opgeslagen. Je gaat hiervoor aan de slag met data fetching, eigen API-endpoints, Server Actions, caching, environment variables en validatie.
 
-> **Belangrijk:** probeer tijdens deze opdracht zo min mogelijk direct naar ChatGPT te grijpen. Zoek eerst zelf naar antwoorden in de officiële Next.js-documentatie. Je leert hierdoor niet alleen wat je moet doen, maar ook hoe je documentatie kunt lezen en interpreteren.
-
-![screenshot-dentist-home.png](docs/screenshots/screenshot-dentist-home.png)
+> **Belangrijk:** probeer ook in deze opdracht zo min mogelijk direct naar ChatGPT te grijpen. Zoek eerst zelf naar antwoorden in de officiële Next.js-documentatie — met name de hoofdstukken over Route Handlers, Server Actions, Caching en Environment Variables zijn hier relevant.
 
 ## Applicatie starten
 
-Als je het project gecloned hebt naar jouw locale machine, installeer je eerst de node_modules door het volgende
-commando in de terminal te runnen
+Dit is een vervolg op je eigen project van deel 1. Zorg dat die opdracht werkt voordat je begint: de navigatie, alle routes, de nested en dynamic route en de kalenderwidget met lokale state moeten al functioneren.
 
 ```bash
 npm install
-```
-
-Wanneer dit klaar is, kun je de applicatie starten met behulp van:
-
-```bash
 npm run dev
 ```
 
-... of gebruik de WebStorm knop (npm run dev). Open http://localhost:3000 om de pagina in de browser te bekijken. Begin
-met het maken van wijzigingen in `src/page.tsx`.
+Open http://localhost:3000 en controleer of je project nog werkt zoals je het in deel 1 hebt opgeleverd.
 
 ## Opdrachtbeschrijving
 
-Begin met het lezen van de officiële [Next.js-documentatie](https://nextjs.org/docs). Je hoeft nog niet alles te begrijpen. Probeer vooral een globaal beeld te krijgen van:
+### 1. Voorbereiding
 
-* hoe een Next.js-project is opgebouwd;
-* wat de `app`-map doet;
-* hoe pagina's worden gemaakt;
-* hoe routing werkt;
-* wat Server Components en Client Components zijn.
+Lees voordat je begint de volgende hoofdstukken van de officiële Next.js-documentatie globaal door:
 
-> "Wat is volgens jou het belangrijkste verschil tussen een traditioneel React-project en een Next.js-project?"
+* Route Handlers and Middleware
+* Fetching Data
+* Caching and Revalidating
+* Server Actions and Mutations
+* Environment Variables
 
-### 1. Pas de metadata aan
-Zorg ervoor dat de naam van de tandartspraktijk in het browsertabblad wordt weergegeven. En nu we daar toch zijn: in de `public`-map zit een SVG-bestand met het logo van de tandartspraktijk. Vervang het standaard Next.js-logo met het bedrijfslogo.
+Je hoeft ze nog niet uit je hoofd te kennen — het is genoeg als je straks weet waar je moet zoeken.
 
-### 2. Navigatie
+> Bedenk voordat je verder leest: in deel 1 stond steeds de vraag centraal "moet dit in de browser draaien, of kan dit op de server?" Welke onderdelen van de kalenderwidget uit deel 1 horen volgens jou eigenlijk op de server thuis, en welke horen echt in de browser te blijven?
 
-De website moet op iedere pagina dezelfde navigatie bevatten. Maak hiervoor een herbruikbaar Navigation-component en onderzoek in de documentatie wat de juiste manier is om zo'n component te gebruiken op de pagina. De navigatie moet minimaal de volgende links bevatten:
-* `/`
-* `gaatjes`
-* `bleken`
-* `afspraken`
+### 2. Behandelingen ophalen via een eigen endpoint
 
-Gebruik voor de links de Next.js-manier van navigeren.
-
-![screenshot-dentist-nav.png](docs/screenshots/screenshot-dentist-nav.png)
-
-Voor de styling is het belangrijk dat je deze structuur aanhoudt:
-
-```html
-<nav>
-    <div className="navigation-container">
-				...
-		</div>
-</nav>
-```
-Daarbinnen kun je de volgende CSS-classes op de elementen gebruiken:
-
-* `.navigation-company-name`
-* `.navigation-links`
-* `.navigation-button` (Let op: de button linkt naar een andere pagina, dus dat is geen echt `<button>`-element)
-
-### 3. Routing
-
-Maak voor iedere route een pagina en zet de routingstructuur op. De inhoud van deze pagina's mag in eerste instantie heel eenvoudig zijn. Geef iedere pagina bijvoorbeeld een eigen `<h1>` met de naam van de pagina. Controleer vervolgens of je via de navigatie daadwerkelijk op iedere pagina kunt komen.
-
-Echter, niet iedere URL die een gebruiker intypt zal bestaan. Maak daarom ook een 404-pagina die wordt weergegeven wanneer een gebruiker naar een route gaat die niet bestaat. Test dit door een random URL te bezoeken, zoals `/fietsen`.
-
-### 5. Content
-
-Nu de routing werkt, kunnen de pagina's worden gevuld met de HTML/JSX die voor deze opdracht is aangeleverd. Gebruik hiervoor de voorbeelden hieronder. Let bij het overnemen van de voorbeelden op dat je HTML omzet naar geldige JSX wanneer dat nodig is. Zorg er daarnaast voor dat links naar andere pagina's gebruikmaken van de Next.js-manier van navigeren.
-
-
-```html
-<!-- Bleken pagina -->
-<main className="page-container">
-    <Header icon="/logo.svg" title="Bleken" />
-
-    <section className="intro">
-        <h2>Een stralend witte glimlach</h2>
-        <p>
-            Wilt u uw tanden een paar tinten lichter maken? Met professioneel
-            tanden bleken kunt u op een veilige manier een stralendere glimlach
-            krijgen. Op deze pagina leest u hoe het proces in zijn werk gaat.
-        </p>
-    </section>
-
-    <section className="card-container">
-        <article className="card">
-            <h3>1. Intake</h3>
-            <p>
-                Tijdens een eerste afspraak bekijken we uw gebit en bespreken we
-                uw wensen. We bepalen samen of tanden bleken geschikt voor u is.
-            </p>
-        </article>
-
-        <article className="card">
-            <h3>2. Behandeling</h3>
-            <p>
-                Onze tandarts geeft uitleg over de behandeling en zorgt ervoor
-                dat het bleken op een professionele en verantwoorde manier
-                gebeurt.
-            </p>
-        </article>
-
-        <article className="card">
-            <h3>3. Resultaat</h3>
-            <p>
-                Na de behandeling zijn uw tanden zichtbaar lichter. Hoeveel het
-                resultaat verschilt, hangt onder andere af van de oorspronkelijke
-                kleur van uw tanden.
-            </p>
-        </article>
-    </section>
-
-    <section className="box warning-box">
-        <h3>Goed om te weten</h3>
-        <p>
-            Niet iedereen kan zijn tanden laten bleken. Laat uw gebit daarom
-            altijd eerst controleren door één van onze tandartsen.
-        </p>
-    </section>
-</main>
-```
-
-```html
-<!-- Gaatjes pagina-->
-<main className="page-container">
-    <Header icon="/logo.svg" title="Gaatjes" />
-
-    <section className="intro">
-        <h2>Heeft u last van een gaatje?</h2>
-        <p>
-            Een gaatje ontstaat wanneer bacteriën in tandplak zuren produceren
-            die het tandglazuur aantasten. Gelukkig kan een gaatje meestal goed
-            worden behandeld wanneer het op tijd wordt ontdekt.
-        </p>
-
-        <a href="#" className="link-button">Maak direct uw afspraak</a>
-    </section>
-
-    <section className="card-container">
-        <article className="card">
-            <h3>Hoe herken ik een gaatje?</h3>
-            <p>
-                Een gaatje kan gevoeligheid veroorzaken bij het eten of drinken
-                van iets kouds, warms of zoets. Soms is er helemaal geen pijn en
-                wordt een gaatje tijdens een controle ontdekt.
-            </p>
-            <p>
-                Daarom is het belangrijk om regelmatig naar de tandarts te gaan,
-                ook wanneer u geen klachten heeft.
-            </p>
-        </article>
-
-        <article className="card">
-            <h3>Hoe wordt het behandeld?</h3>
-            <p>
-                De tandarts verwijdert het aangetaste gedeelte van de tand en
-                vult de ontstane ruimte met een vulling. De behandeling voorkomt
-                dat het gaatje verder groter wordt.
-            </p>
-            <p>
-                Hoe eerder een gaatje wordt ontdekt, hoe eenvoudiger de
-                behandeling meestal is.
-            </p>
-        </article>
-    </section>
-
-    <section className="card">
-        <h3>Voorkomen is beter dan genezen</h3>
-        <p>
-            Poets minimaal twee keer per dag met fluoridehoudende tandpasta en
-            maak dagelijks de ruimtes tussen uw tanden schoon.
-        </p>
-    </section>
-</main>
-```
-
-```html
-<!--Afspraken pagina-->
-<main className="page-container">
-    <Header icon="/logo.svg" title="Afspraken"/>
-
-    <section className="intro">
-        <h2>Een afspraak maken</h2>
-        <p>
-            Wilt u een controle plannen, heeft u een klacht of wilt u meer
-            informatie over een behandeling? Neem dan contact met ons op. Bij ernstige pijn, een afgebroken tand
-            of een ongeval kunt u het beste direct telefonisch contact met ons opnemen.
-        </p>
-    </section>
-
-    <section className="card-container">
-        <article className="card">
-            <h3>Telefonisch</h3>
-            <p>U kunt ons tijdens openingstijden telefonisch bereiken.</p>
-            <strong>030 - 123 45 67</strong>
-        </article>
-
-        <article className="card">
-            <h3>Openingstijden</h3>
-            <p>Maandag t/m vrijdag</p>
-            <p>08:00 - 17:00 uur</p>
-        </article>
-
-        <article className="card">
-            <h3>Online afspraken</h3>
-            <p>Wilt u een controle plannen of heeft u een klacht? U kunt eenvoudig een afspraak maken.</p>
-            <a href="#" className="link-button"> Maak een afspraak </a>
-        </article>
-    </section>
-</main>
-```
-
-### 4. Nested route
-
-Een gebruiker moet vanuit de afsprakenpagina kunnen doorklikken naar de plek waarop de afspraak daadwerkelijk kan worden gepland. De URL daarvoor moet worden:
-
-`/afspraken/maken`
-
-Dit is een **nested route**. Nested routes zie je vooral wanneer een pagina onderdeel is van een grotere structuur, zoals webshops met productcategorieën. Pas je mappenstructuur zo aan dat deze URL automatisch door Next.js wordt herkend. Geef de nieuwe pagina eerst een eenvoudige titel om te controleren of de routing werkt. 
-
-Daarna kun je deze vullen met de volgende HTML:
-
-```html
-<main className="page-container">
-    <Header icon="/logo.svg" title="Afspraak maken" />
-
-    <section className="intro">
-        <h2>Plan uw afspraak</h2>
-        <p>
-            Fijn dat u een afspraak wilt maken bij Tandartspraktijk de
-            Tandenborstel. Kies hieronder waarvoor u een afspraak wilt maken.
-        </p>
-    </section>
-
-    <section className="card-container">
-        <article className="card">
-            <h3>Periodieke controle</h3>
-            <p>
-                Tijdens een controle bekijkt de tandarts uw tanden en
-                tandvlees. We controleren of er gaatjes of andere problemen
-                zijn.
-            </p>
-            <a href="#" className="link-button">
-            Plan periodieke controle
-            </a>
-        </article>
-
-        <article className="card">
-            <h3>Tanden bleken</h3>
-            <p>
-                Wilt u meer informatie of een afspraak maken voor het bleken
-                van uw tanden?
-            </p>
-            <a href="#" className="link-button">
-            Maak bleekafspraak
-            </a>
-        </article>
-    </section>
-
-    <section className="card-container">
-        <article className="card">
-            <h3>Pijn of klacht</h3>
-            <p>
-                Staat uw behandeling er niet tussen? Heeft u pijn of andere klachten die beoordeeld moeten worden? Neem dan contact met ons op. We helpen u graag verder.
-            </p>
-            <a href="#" className="link-button">
-            Neem contact op
-            </a>
-        </article>
-    </section>
-
-    <section className="box info-box">
-        <h3>Wat gebeurt er daarna?</h3>
-        <p>
-            Nadat u uw behandeling heeft gekozen, kunt u een geschikt moment
-            selecteren. In deze oefening is het vervolg nog niet uitgewerkt.
-        </p>
-    </section>
-</main>
-```
-
-### 6. Dynamic route
-De tandartspraktijk biedt verschillende behandelingen aan waarvoor een afspraak gemaakt kan worden. Op dit moment zijn er bijvoorbeeld:
-* een periodieke controle;
-* tanden bleken;
-* een klacht, zoals pijn of een uitgevallen kies.
-
-In de toekomst kunnen daar nieuwe behandelingen bij komen. In plaats van voor iedere behandeling een aparte pagina te maken, gaan we daarom gebruikmaken van een dynamic route, waarbij de pagina zich aanpast op basis van de url.
-
-![screenshot-to-appointment-widget.png](docs/screenshots/screenshot-to-appointment-widget.png)
-
-De URL's moeten bijvoorbeeld worden:
-* `/afspraken/maken/controle`
-* `/afspraken/maken/bleken`
-* `/afspraken/maken/klacht`
-
-Maak hiervoor een dynamic route met bijbehorende pagina. Wanneer een gebruiker bijvoorbeeld naar: `/afspraken/maken/bleken` gaat, moet op de pagina de naam van de behandeling worden weergegeven (_"Tanden bleken"_). Gebruik onderstaande array om op de pagina te bepalen welke behandelingen bij welke url hoort:
+In deel 1 stond de lijst met behandelingen hardcoded in je dynamic-route-pagina:
 
 ```js
 const treatments = [
-{ url: "controle", name: "Periodieke controle" },
-{ url: "bleken", name: "Tanden bleken" },
-{ url: "klacht", name: "Pijn of klacht" },
+  { url: "controle", name: "Periodieke controle" },
+  { url: "bleken", name: "Tanden bleken" },
+  { url: "klacht", name: "Pijn of klacht" },
 ];
 ```
 
-Wat gebeurt er nu als iemand `/afspraken/maken/fietsen` intypt? Dat is natuurlijk niet de bedoeling! Zorg ervoor dat een gebruiker in dat geval wordt doorgestuurd naar de 404-pagina.
+Verplaats deze array naar een eigen Route Handler op `app/api/behandelingen/route.ts`, die deze data teruggeeft als JSON:
 
-> Wat is het verschil tussen een URL waarvoor helemaal geen route bestaat en een URL die wel bij een dynamic route past, maar waarvan de slug geen geldige behandeling is?
+```ts
+// app/api/behandelingen/route.ts
+const treatments = [
+  { url: "controle", name: "Periodieke controle" },
+  { url: "bleken", name: "Tanden bleken" },
+  { url: "klacht", name: "Pijn of klacht" },
+];
 
-### 7. Afspraak maken
-De pagina voor een specifieke behandeling bevat een eenvoudige kalender en een lijst met beschikbare tijden. Op dit moment zijn deze elementen nog statisch: de gebruiker kan niets selecteren. Gebruik de volgende HTML en controleer of de naam van de behandeling op de juiste plaats wordt weergegeven.
-
-```html
-<main className="page-container">
-    <h1>Afspraak maken</h1>
-    <section className="intro">
-        <h2>Behandeling: ...</h2>
-        <p> U wilt een afspraak maken voor de behandeling <strong> ... </strong>.</p>
-    </section>
-    <section className="card-container">
-        <article className="card">
-            <h2>Kies een datum</h2>
-            <div className="calendar-grid">
-                <span>Ma</span>
-                <span>Di</span>
-                <span>Wo</span>
-                <span>Do</span>
-                <span>Vr</span>
-								
-								{Array.from({length: 29}, (item, index) => ( <span key={index}>{index + 1}</span> ))}
-            </div>
-        </article>
-        <article className="card calendar">
-						<h2>Kies een tijd</h2>
-            <div className="time-list">
-                <button>09:00</button>
-                <button>09:30</button>
-                <button>10:30</button>
-                <button>11:00</button>
-                <button>11:30</button>
-                <button>13:30</button>
-                <button>14:30</button>
-                <button>15:00</button>
-                <button>15:30</button>
-            </div>
-        </article>
-    </section>
-</main>
+export async function GET() {
+  return Response.json({ treatments });
+}
 ```
 
-Het hardcoded declareren van de tijden in de HTML is natuurlijk een beetje suf. Gebruik deze array om dit efficiënter weer te geven in de HTML:
+Pas je dynamic-route-pagina (`/afspraken/maken/[behandeling]`) aan zodat deze de behandelingen niet meer uit een lokale array haalt, maar ophaalt bij dit endpoint. Let op: dit blijft een Server Component, dus je kunt de fetch gewoon rechtstreeks in de pagina zelf doen.
 
-```js
-const times = [ "09:00", "09:30", "10:00", "10:30", "11:00", "11:30"];
+Controleer dat de 404-afhandeling nog steeds werkt: wanneer iemand naar `/afspraken/maken/fietsen` gaat, moet dit nog steeds doorverwijzen naar je 404-pagina — ook al komt de lijst met geldige behandelingen nu van een endpoint in plaats van een lokale array.
+
+> Wat is het verschil tussen het rechtstreeks importeren van de `treatments`-array in je pagina (zoals in deel 1) en het ophalen ervan via `fetch()` bij een eigen Route Handler (zoals nu)? Bedenk een situatie waarin dat verschil er echt toe doet.
+
+### 3. Beschikbare tijden per dag
+
+Op dit moment toont de kalenderwidget voor elke dag dezelfde, hardcoded lijst met tijden uit deel 1. In werkelijkheid is niet elk tijdstip op elke dag beschikbaar — tijden die al geboekt zijn, mogen niet nog een keer worden getoond.
+
+Maak een bestand `lib/afspraken.ts` dat, net als een echte database, de afspraken bijhoudt — voorlopig gewoon in een array in het geheugen:
+
+```ts
+// lib/afspraken.ts
+export type Afspraak = {
+  id: number;
+  behandeling: string; // de url-slug, bijv. "bleken"
+  datum: string;       // bijv. "2026-09-12"
+  tijd: string;         // bijv. "10:30"
+  naam: string;
+  email: string;
+};
+
+const afspraken: Afspraak[] = [];
+let nextId = 1;
+
+export function getAfspraken(): Afspraak[] {
+  return afspraken;
+}
+
+export function isTijdBezet(behandeling: string, datum: string, tijd: string): boolean {
+  return afspraken.some(
+    (a) => a.behandeling === behandeling && a.datum === datum && a.tijd === tijd
+  );
+}
+
+export function voegAfspraakToe(afspraak: Omit<Afspraak, "id">): Afspraak {
+  const nieuw = { id: nextId++, ...afspraak };
+  afspraken.push(nieuw);
+  return nieuw;
+}
 ```
 
-> Waarom is het in dit geval handiger om de times-array _buiten_ de functie te declareren in plaats van binnen de functie?
+Maak vervolgens een Route Handler op `app/api/tijden/route.ts` die, gegeven een behandeling en een datum, de volledige tijden-array uit deel 1 teruggeeft *minus* de tijden die al bezet zijn. Gebruik hiervoor de `searchParams` van het `Request`-object:
 
-Zet de HTML voor de kalender en de tijd-selectie nu in een **apart component**. Geef de `times`-array vanaf deze pagina door als property aan dit component.
+```ts
+// app/api/tijden/route.ts
+import { isTijdBezet } from "../../../lib/afspraken";
 
-> Om de kalender interactief te maken hebben we state nodig. Wat moet je in Next.js doen om gebruik te kunnen maken van state?
+const alleTijden = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"];
 
-In ons component willen we met behulp van state bijhouden welke datum de gebruiker heeft geselecteerd. Houd op dezelfde manier bij welke tijd de gebruiker heeft geselecteerd wanneer de gebruiker op een waarde klikt. Om dit visueel te maken kun je de class `selected` op een actief span-element zetten.
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const behandeling = searchParams.get("behandeling");
+  const datum = searchParams.get("datum");
 
-Wanneer zowel een datum als een tijd zijn gekozen, toon je de gemaakte keuze boven de tijden. Voor nu gaan we er even vanuit dat alle voorgestelde datums in september zijn. Bijvoorbeeld: "U heeft gekozen voor 12 september om 10:30."
+  if (!behandeling || !datum) {
+    return Response.json(
+      { error: "behandeling en datum zijn verplicht." },
+      { status: 400 }
+    );
+  }
 
-![screenshot-appointment-widget.png](docs/screenshots/screenshot-appointment-widget.png)
+  const beschikbareTijden = alleTijden.filter(
+    (tijd) => !isTijdBezet(behandeling, datum, tijd)
+  );
+
+  return Response.json({ tijden: beschikbareTijden });
+}
+```
+
+Je kalendercomponent is een Client Component (hij houdt tenslotte state bij van de geselecteerde datum). Zorg dat deze component, telkens wanneer een gebruiker een nieuwe datum aanklikt, dit endpoint opnieuw aanroept met een gewone `fetch()` en de getoonde tijden bijwerkt. Toon een duidelijke laadstatus terwijl de tijden worden opgehaald.
+
+> In deel 1 stond de `times`-array *buiten* de component gedeclareerd. Waarom kan dat nu niet meer op dezelfde manier?
+
+### 4. Een afspraak daadwerkelijk vastleggen (Server Action)
+
+Voeg aan de kalenderwidget een bevestigingsknop toe ("Afspraak bevestigen") die verschijnt zodra een datum én tijd zijn gekozen, samen met invoervelden voor naam en e-mailadres.
+
+Maak in `app/afspraken/maken/[behandeling]/actions.ts` een Server Action die de afspraak verwerkt:
+
+```ts
+"use server";
+
+import { isTijdBezet, voegAfspraakToe } from "../../../../lib/afspraken";
+import { revalidatePath } from "next/cache";
+
+export type AfspraakResultaat =
+  | { success: true; afspraak: { datum: string; tijd: string } }
+  | { success: false; error: string };
+
+export async function maakAfspraakAction(
+  _vorigeStatus: AfspraakResultaat,
+  formData: FormData
+): Promise<AfspraakResultaat> {
+  const behandeling = formData.get("behandeling") as string;
+  const datum = formData.get("datum") as string;
+  const tijd = formData.get("tijd") as string;
+  const naam = formData.get("naam") as string;
+  const email = formData.get("email") as string;
+
+  // Validatie hoort hier, niet (alleen) in de browser: een gebruiker kan
+  // de client-side controles altijd omzeilen.
+  if (!naam || naam.trim().length === 0) {
+    return { success: false, error: "Vul uw naam in." };
+  }
+  if (!email || !email.includes("@")) {
+    return { success: false, error: "Vul een geldig e-mailadres in." };
+  }
+  if (isTijdBezet(behandeling, datum, tijd)) {
+    return { success: false, error: "Dit tijdstip is helaas net vergeven. Kies een ander tijdstip." };
+  }
+
+  voegAfspraakToe({ behandeling, datum, tijd, naam: naam.trim(), email: email.trim() });
+
+  // De lijst met beschikbare tijden moet na het boeken opnieuw worden
+  // opgehaald, anders blijft het net vergeven tijdstip zichtbaar.
+  revalidatePath("/afspraken/maken/" + behandeling);
+
+  return { success: true, afspraak: { datum, tijd } };
+}
+```
+
+Koppel deze Server Action aan je formulier (bijvoorbeeld met `useFormState` uit `react-dom`). Toon bij succes een bevestiging in dezelfde stijl als in deel 1 ("U heeft een afspraak gemaakt voor 12 september om 10:30."), en bij een fout de foutmelding die de Server Action teruggeeft.
+
+> Waarom controleer je `isTijdBezet` hier nog een keer, terwijl de tijd toch al uit een gefilterde lijst kwam die deze tijden niet meer zou moeten bevatten? Bedenk een scenario waarin dit verschil maakt.
+
+### 5. Cachen van de juiste data
+
+Niet alle data in deze applicatie verandert even vaak. Bekijk de twee endpoints die je hebt gebouwd en bepaal voor elk een passende cache-strategie:
+
+* `/api/behandelingen` — de lijst met behandelingen wijzigt zelden.
+* `/api/tijden` — de beschikbare tijden veranderen bij elke nieuwe boeking.
+
+Pas de `fetch()`-aanroepen naar deze endpoints aan met de cache-strategie die jij het meest passend vindt (`force-cache`, `no-store`, of `next: { revalidate: ... }`), en onderbouw je keuze in een kort commentaar bij de code.
+
+> Wat zou er (zichtbaar voor een gebruiker) misgaan als je voor `/api/tijden` per ongeluk `force-cache` zou gebruiken?
+
+### 6. Praktijkgegevens en een beveiligde overzichtspagina
+
+De praktijk wil zelf een overzicht kunnen inzien van alle gemaakte afspraken, maar dit overzicht mag natuurlijk niet voor iedereen toegankelijk zijn.
+
+Maak een `.env.local`-bestand (dit bestand commit je niet, het staat al in `.gitignore`) met twee variabelen:
+
+```
+ADMIN_SLEUTEL="tandenborstel-demo-2026"
+NEXT_PUBLIC_PRAKTIJK_TELEFOONNUMMER="030 - 123 45 67"
+```
+
+Gebruik `NEXT_PUBLIC_PRAKTIJK_TELEFOONNUMMER` om het telefoonnummer op de afsprakenpagina te tonen in plaats van dit hardcoded in de JSX te zetten.
+
+Maak vervolgens een pagina op `/admin/afspraken` die:
+* alle afspraken uit `lib/afspraken.ts` toont in een tabel (naam, e-mailadres, behandeling, datum, tijd), maar alleen wanneer de bezoeker de juiste sleutel meegeeft, bijvoorbeeld via `/admin/afspraken?sleutel=tandenborstel-demo-2026`;
+* een duidelijke melding toont ("Geen toegang") wanneer de sleutel ontbreekt of onjuist is.
+
+Vergelijk hierbij bewust de twee variabelen: waarom gebruik je voor het telefoonnummer wél het `NEXT_PUBLIC_`-voorvoegsel, en voor de sleutel niet?
+
+> Deze manier van beveiligen (een sleutel in de URL) is bewust simpel gehouden voor deze opdracht. Wat zijn de zwaktes hiervan? Wat zou een volgende, betere stap zijn om deze pagina echt te beveiligen?
+
+### 7. Database koppeling (conceptueel)
+
+`lib/afspraken.ts` gedraagt zich in deze opdracht als een piepkleine database: alle Route Handlers en Server Actions die met afspraken werken, praten uitsluitend via de functies in dit bestand met de data, en dit bestand wordt nooit vanuit een Client Component geïmporteerd.
+
+Beantwoord de volgende vragen in een kort tekstblokje (bijvoorbeeld bovenaan je README, of als los antwoordbestand):
+
+> Herstart je development-server. Wat is er met de gemaakte afspraken gebeurd, en waarom?
+
+> Zou het een probleem zijn als `getAfspraken()`, `isTijdBezet()` en `voegAfspraakToe()` ook in een Client Component gebruikt zouden mogen worden? Betrek in je antwoord zowel de `ADMIN_SLEUTEL` als de gegevens van andere bezoekers.
+
+> Wat zou er moeten veranderen aan `lib/afspraken.ts` om dit daadwerkelijk met een relationele database te laten werken in plaats van met een array in het geheugen? Je hoeft dit nog niet te bouwen — een korte beschrijving in eigen woorden is genoeg. (Dit is precies waar de volgende les mee verdergaat.)
